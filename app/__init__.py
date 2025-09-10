@@ -1,11 +1,12 @@
-from flask import Flask
+from flask import Flask, g
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf.csrf import CSRFProtect
+from flask_migrate import Migrate
 import os
 from dotenv import load_dotenv
-
 db = SQLAlchemy()
 csrf = CSRFProtect()
+migrate = Migrate()
 
 def create_app():
     app = Flask(__name__, 
@@ -49,10 +50,17 @@ def create_app():
     # Initialize extensions
     db.init_app(app)
     csrf.init_app(app)
+    migrate.init_app(app, db)
     
     # Register blueprints
     from app.routes import main
     app.register_blueprint(main)
+    
+    # Make newsletter form available to all templates
+    @app.context_processor
+    def inject_newsletter_form():
+        from .forms import NewsletterSignupForm
+        return dict(newsletter_form=NewsletterSignupForm())
     
     # Create database tables
     with app.app_context():

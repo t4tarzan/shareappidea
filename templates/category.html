@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block title %}{{ category }} - Student Startup Ideas{% endblock %}
+
+{% block content %}
+<header class="category-header">
+    <h1>{{ category }}</h1>
+    <p>Browse all ideas in the {{ category }} category</p>
+</header>
+
+{% if featured_ideas %}
+<section class="featured-ideas">
+    <h2 class="section-title">Featured {{ category }} Ideas</h2>
+    <div class="featured-carousel">
+        {% for idea in featured_ideas %}
+        <div class="featured-idea">
+            <div class="featured-content">
+                <h3>{{ idea.title }}</h3>
+                <p class="meta">By {{ idea.student_name }} • {{ idea.category or 'General' }}</p>
+                <div class="problem-container">
+                    <h4>Problem:</h4>
+                    <p class="problem">{{ idea.problem|truncate(150) }}</p>
+                </div>
+                <a href="{{ url_for('main.view_idea', idea_id=idea.id) }}" class="button small">View Details</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
+<section class="all-ideas">
+    <h2 class="section-title">All {{ category }} Ideas</h2>
+    
+    {% if ideas.items %}
+    <div class="ideas-grid">
+        {% for idea in ideas.items %}
+        <div class="idea-card">
+            <h3><a href="{{ url_for('main.view_idea', idea_id=idea.id) }}">{{ idea.title }}</a></h3>
+            <p class="meta">By {{ idea.student_name }} • {{ idea.created_at.strftime('%b %d, %Y') }}</p>
+            <div class="problem-container">
+                <p class="problem">{{ idea.problem|truncate(200) }}</p>
+            </div>
+            <div class="idea-footer">
+                <span class="views">{{ idea.views }} views</span>
+                <a href="{{ url_for('main.view_idea', idea_id=idea.id) }}" class="read-more">Read more →</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <!-- Pagination -->
+    <div class="pagination">
+        {% if ideas.has_prev %}
+            <a href="{{ url_for('main.browse_category', category=category, page=ideas.prev_num) }}" class="button">Previous</a>
+        {% endif %}
+        
+        <span class="page-info">Page {{ ideas.page }} of {{ ideas.pages }}</span>
+        
+        {% if ideas.has_next %}
+            <a href="{{ url_for('main.browse_category', category=category, page=ideas.next_num) }}" class="button">Next</a>
+        {% endif %}
+    </div>
+    {% else %}
+    <div class="no-results">
+        <p>No ideas found in this category yet. Be the first to <a href="{{ url_for('main.submit') }}">submit an idea</a>!</p>
+    </div>
+    {% endif %}
+</section>
+{% endblock %}
