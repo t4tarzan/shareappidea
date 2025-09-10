@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}{{ idea.title }} - Student Startup Ideas{% endblock %}
+
+{% block content %}
+<article class="idea-detail">
+    <div class="idea-header">
+        <h1>{{ idea.title }}</h1>
+        <div class="idea-meta">
+            <span class="author">By {{ idea.student_name }}</span>
+            <span class="date">{{ idea.created_at.strftime('%B %d, %Y') }}</span>
+            <span class="views">{{ idea.views }} views</span>
+            {% if idea.category %}
+            <span class="category">{{ idea.category }}</span>
+            {% endif %}
+        </div>
+    </div>
+
+    <section class="idea-content">
+        <div class="problem-section">
+            <h2>Problem Statement</h2>
+            <p>{{ idea.problem }}</p>
+        </div>
+
+        <div class="solution-section">
+            <h2>Proposed Solution</h2>
+            <p>{{ idea.description }}</p>
+        </div>
+    </section>
+
+    <div class="idea-actions">
+        <a href="{{ url_for('main.index') }}" class="button">Back to Ideas</a>
+        <a href="{{ url_for('main.submit') }}" class="button primary">Submit Your Own Idea</a>
+    </div>
+</article>
+{% endblock %}

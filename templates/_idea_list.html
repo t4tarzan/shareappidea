@@ -1,0 +1,25 @@
+{% for idea in ideas %}
+<article class="idea-card">
+    <div class="idea-card-header">
+        <h3><a href="{{ url_for('main.view_idea', idea_id=idea.id) }}">{{ idea.title }}</a></h3>
+        {% if idea.category %}
+        <span class="category-badge">{{ idea.category }}</span>
+        {% endif %}
+    </div>
+    
+    <div class="idea-card-meta">
+        <span class="author">By {{ idea.student_name }}</span>
+        <span class="date">{{ idea.created_at.strftime('%b %d, %Y') }}</span>
+        <span class="views"><i class="fas fa-eye"></i> {{ idea.views }}</span>
+    </div>
+    
+    <div class="idea-card-content">
+        <h4>Problem:</h4>
+        <p class="problem">{{ idea.problem|truncate(200) }}</p>
+    </div>
+    
+    <div class="idea-card-footer">
+        <a href="{{ url_for('main.view_idea', idea_id=idea.id) }}" class="read-more">Read more <i class="fas fa-arrow-right"></i></a>
+    </div>
+</article>
+{% endfor %}

@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+
+{% block title %}Search Results - Student Startup Ideas{% endblock %}
+
+{% block content %}
+<header class="search-header">
+    <div class="container">
+        <h1>Search Results</h1>
+        <div class="search-filters">
+            <form id="searchForm" action="{{ url_for('main.search_ideas') }}" method="GET" class="search-form">
+                <div class="search-input-group">
+                    <input type="text" 
+                           name="q" 
+                           value="{{ query }}" 
+                           placeholder="Search ideas..." 
+                           class="search-input"
+                           aria-label="Search ideas">
+                    <button type="submit" class="search-button">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+                <div class="filter-group">
+                    <select name="category" class="category-filter" onchange="this.form.submit()">
+                        <option value="all" {% if not selected_category or selected_category == 'all' %}selected{% endif %}>All Categories</option>
+                        <option value="Technology" {% if selected_category == 'Technology' %}selected{% endif %}>Technology</option>
+                        <option value="Education" {% if selected_category == 'Education' %}selected{% endif %}>Education</option>
+                        <option value="Healthcare" {% if selected_category == 'Healthcare' %}selected{% endif %}>Healthcare</option>
+                        <option value="Finance" {% if selected_category == 'Finance' %}selected{% endif %}>Finance</option>
+                        <option value="Sustainability" {% if selected_category == 'Sustainability' %}selected{% endif %}>Sustainability</option>
+                        <option value="Social Impact" {% if selected_category == 'Social Impact' %}selected{% endif %}>Social Impact</option>
+                    </select>
+                    <select name="sort_by" class="sort-filter" onchange="this.form.submit()">
+                        <option value="newest" {% if sort_by == 'newest' %}selected{% endif %}>Newest First</option>
+                        <option value="oldest" {% if sort_by == 'oldest' %}selected{% endif %}>Oldest First</option>
+                        <option value="views" {% if sort_by == 'views' %}selected{% endif %}>Most Viewed</option>
+                        <option value="title" {% if sort_by == 'title' %}selected{% endif %}>Title (A-Z)</option>
+                    </select>
+                </div>
+            </form>
+        </div>
+        
+        {% if query %}
+        <p class="search-summary">
+            Found {{ ideas.total }} result{% if ideas.total != 1 %}s{% endif %} for "{{ query }}"
+            {% if selected_category and selected_category != 'all' %}in {{ selected_category }}{% endif %}
+        </p>
+        {% endif %}
+    </div>
+</header>
+
+<section class="search-results">
+    <div class="container">
+        <div id="ideaList" class="ideas-grid">
+            {% include '_idea_list.html' %}
+        </div>
+        
+        {% if ideas.has_next %}
+        <div class="load-more-container">
+            <button id="loadMore" class="button primary" 
+                    data-page="2" 
+                    data-query="{{ query }}" 
+                    data-category="{{ selected_category }}"
+                    data-sort="{{ sort_by }}">
+                Load More Ideas
+            </button>
+        </div>
+        {% endif %}
+        
+        {% if not ideas.items %}
+        <div class="no-results">
+            <p>No ideas found matching your search criteria. Try adjusting your filters or <a href="{{ url_for('main.submit') }}">submit a new idea</a>!</p>
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const loadMoreBtn = document.getElementById('loadMore');
+    
+    if (loadMoreBtn) {
+        loadMoreBtn.addEventListener('click', function() {
+            const page = this.dataset.page;
+            const query = this.dataset.query || '';
+            const category = this.dataset.category || 'all';
+            const sort = this.dataset.sort || 'newest';
+            
+            // Show loading state
+            this.disabled = true;
+            this.textContent = 'Loading...';
+            
+            // Make AJAX request
+            fetch(`/search?q=${encodeURIComponent(query)}&category=${encodeURIComponent(category)}&sort_by=${sort}&page=${page}`, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Append new ideas
+                const ideaList = document.getElementById('ideaList');
+                ideaList.insertAdjacentHTML('beforeend', data.html);
+                
+                // Update button for next page or hide if no more results
+                if (data.has_next) {
+                    this.dataset.page = parseInt(page) + 1;
+                    this.disabled = false;
+                    this.textContent = 'Load More Ideas';
+                } else {
+                    this.remove();
+                }
+            })
+            .catch(error => {
+                console.error('Error loading more ideas:', error);
+                this.disabled = false;
+                this.textContent = 'Error loading more ideas. Try again.';
+            });
+        });
+    }
+});
+</script>
+{% endblock %}

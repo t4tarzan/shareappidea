@@ -1,0 +1,53 @@
+{# Form field rendering macro #}
+{% macro render_field(field) %}
+<div class="form-group">
+    {{ field.label(class="form-control-label") }}
+    {% if field.errors %}
+        {{ field(class="form-control is-invalid") }}
+        <div class="invalid-feedback">
+            {% for error in field.errors %}
+                <span>{{ error }}</span>
+            {% endfor %}
+        </div>
+    {% else %}
+        {{ field(class="form-control") }}
+    {% endif %}
+</div>
+{% endmacro %}
+
+{# Flash messages macro #}
+{% macro render_flash_messages() %}
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+{% endmacro %}
+
+{# Idea card macro #}
+{% macro idea_card(idea) %}
+<div class="card mb-4">
+    <div class="card-body">
+        <h5 class="card-title">{{ idea.title }}</h5>
+        <h6 class="card-subtitle mb-2 text-muted">
+            By {{ idea.student_name }} • {{ idea.created_at.strftime('%B %d, %Y') }}
+            {% if idea.views is defined %}
+                • 👁️ {{ idea.views }} views
+            {% endif %}
+        </h6>
+        <div class="card-text">
+            <p>{{ idea.description|truncate(200) }}</p>
+            <span class="badge bg-primary">{{ idea.category }}</span>
+            {% if idea.featured %}
+                <span class="badge bg-warning">Featured</span>
+            {% endif %}
+        </div>
+        <a href="{{ url_for('main.idea_detail', idea_id=idea.id) }}" class="btn btn-primary mt-2">View Details</a>
+    </div>
+</div>
+{% endmacro %}

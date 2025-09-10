@@ -1,12 +1,88 @@
 {% extends "base.html" %}
 
+{% from 'macros.html' import render_field %}
+
 {% block title %}Student Startup Ideas{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/newsletter.css') }}">
+{% endblock %}
 
 {% block content %}
     <section class="hero">
         <h1>Student Startup Ideas</h1>
         <p>Showcasing innovative ideas from students around the world</p>
         <a href="{{ url_for('main.submit') }}" class="button primary">Submit Your Idea</a>
+    </section>
+
+    {% if featured_ideas %}
+    <section class="featured-ideas">
+        <h2 class="section-title">Featured Ideas</h2>
+        <div class="featured-carousel">
+            {% for idea in featured_ideas %}
+            <div class="featured-idea">
+                <div class="featured-content">
+                    <h3>{{ idea.title }}</h3>
+                    <p class="meta">By {{ idea.student_name }} • {{ idea.category or 'General' }}</p>
+                    <div class="problem-container">
+                        <h4>Problem:</h4>
+                        <p class="problem">{{ idea.problem|truncate(150) }}</p>
+                    </div>
+                    <a href="#" class="button small">View Details</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+
+    {% if trending_ideas %}
+    <section class="trending-ideas">
+        <h2 class="section-title">Trending Now</h2>
+        <div class="trending-grid">
+            {% for idea in trending_ideas %}
+            <a href="{{ url_for('main.view_idea', idea_id=idea.id) }}" class="trending-idea">
+                <h3>{{ idea.title }}</h3>
+                <p class="meta">By {{ idea.student_name }} • {{ idea.views }} views</p>
+                <p class="excerpt">{{ idea.problem|truncate(100) }}</p>
+                <span class="read-more">Read more →</span>
+            </a>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+
+    <!-- Newsletter Signup Section -->
+    <section class="newsletter-section">
+        <div class="container">
+            <div class="newsletter-container">
+                <div class="newsletter-content">
+                    <h2>Stay Updated</h2>
+                    <p>Subscribe to our newsletter to receive the latest startup ideas and updates directly in your inbox.</p>
+                    <form id="newsletterForm" class="newsletter-form" action="{{ url_for('main.subscribe_newsletter') }}" method="POST">
+                        {{ newsletter_form.hidden_tag() }}
+                        <div class="form-group">
+                            {{ newsletter_form.name(placeholder="Your name (optional)", class_="form-control") }}
+                            {% if newsletter_form.name.errors %}
+                                <div class="error-message">{{ newsletter_form.name.errors[0] }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="form-group">
+                            {{ newsletter_form.email(placeholder="Your email address", class_="form-control", required=true) }}
+                            {% if newsletter_form.email.errors %}
+                                <div class="error-message">{{ newsletter_form.email.errors[0] }}</div>
+                            {% endif %}
+                            <small class="form-text">We'll never share your email with anyone else.</small>
+                        </div>
+                        <button type="submit" class="button primary">Subscribe</button>
+                    </form>
+                    <div id="newsletterMessage" class="newsletter-message"></div>
+                </div>
+                <div class="newsletter-image">
+                    <img src="{{ url_for('static', filename='images/newsletter-illustration.svg') }}" alt="Newsletter illustration" class="img-fluid">
+                </div>
+            </div>
+        </div>
     </section>
 
     <!-- Search and Filter Section -->
