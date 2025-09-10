@@ -16,7 +16,20 @@
         <nav>
             <div class="container">
                 <a href="{{ url_for('main.index') }}" class="logo">StudentStartupIdeas</a>
-                <a href="{{ url_for('main.submit') }}" class="button">Submit Idea</a>
+                <div class="nav-links">
+                    <div class="dropdown">
+                        <button class="dropbtn">Categories <i class="fas fa-chevron-down"></i></button>
+                        <div class="dropdown-content">
+                            <a href="{{ url_for('main.browse_category', category='Technology') }}">Technology</a>
+                            <a href="{{ url_for('main.browse_category', category='Education') }}">Education</a>
+                            <a href="{{ url_for('main.browse_category', category='Healthcare') }}">Healthcare</a>
+                            <a href="{{ url_for('main.browse_category', category='Finance') }}">Finance</a>
+                            <a href="{{ url_for('main.browse_category', category='Sustainability') }}">Sustainability</a>
+                            <a href="{{ url_for('main.browse_category', category='Social Impact') }}">Social Impact</a>
+                        </div>
+                    </div>
+                    <a href="{{ url_for('main.submit') }}" class="button">Submit Idea</a>
+                </div>
             </div>
         </nav>
     </header>
@@ -35,11 +48,13 @@
 
     <footer>
         <div class="container">
-            <p>© 2025 StudentStartupIdeas - Showcasing student innovation</p>
+            <p> 2025 StudentStartupIdeas - Showcasing student innovation</p>
         </div>
     </footer>
 
+    <!-- Custom JS -->
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/newsletter.js') }}"></script>
     {% block scripts %}{% endblock %}
 </body>
 </html>

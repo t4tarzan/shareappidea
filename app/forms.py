@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, TextAreaField, SelectField, SubmitField
-from wtforms.validators import DataRequired, Length
+from wtforms import StringField, TextAreaField, SelectField, SubmitField, SelectMultipleField
+from wtforms.validators import DataRequired, Length, Optional, Email
 
 class IdeaForm(FlaskForm):
     title = StringField('Idea Title', validators=[
@@ -34,3 +34,27 @@ class IdeaForm(FlaskForm):
     ])
     
     submit = SubmitField('Submit Idea')
+
+class NewsletterSignupForm(FlaskForm):
+    """Form for newsletter signup"""
+    name = StringField('Your Name', validators=[
+        Length(max=100, message='Name must be less than 100 characters'),
+        Optional()
+    ], render_kw={
+        'placeholder': 'Your name (optional)',
+        'class': 'form-control'
+    })
+    
+    email = StringField('Email Address', validators=[
+        DataRequired('Please enter your email address'),
+        Email('Please enter a valid email address'),
+        Length(max=120, message='Email must be less than 120 characters')
+    ], render_kw={
+        'placeholder': 'Your email address',
+        'class': 'form-control',
+        'aria-describedby': 'emailHelp'
+    })
+    
+    submit = SubmitField('Subscribe', render_kw={
+        'class': 'button primary'
+    })
