@@ -1,14 +1,19 @@
-# Student Startup Ideas Platform
+# Student Startup Ideas
 
-A simple, modern web application for students to submit and showcase their startup ideas. Built with Python Flask and SQLite, designed to be easy to deploy and use.
+A platform for students to share and discover innovative startup ideas.
 
 ## Features
+- Submit new startup ideas
+- Browse existing ideas
+- Categorize ideas by domain
 
-- Submit startup ideas with title, description, and problem statement
-- View all ideas in a responsive grid layout
-- Simple and intuitive user interface
-- Mobile-friendly design
-- No external database required (uses SQLite)
+## Setup
+1. Clone the repository
+2. Install dependencies: `pip install -r requirements.txt`
+3. Run the app: `python run.py`
+
+## Deployment
+Deployed on Heroku: [shareappidea.herokuapp.com](https://shareappidea-54421fe6c334.herokuapp.com/)
 
 ## Prerequisites
 
