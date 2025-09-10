@@ -1,0 +1,174 @@
+{% extends "base.html" %}
+
+{% block title %}Submit Your Idea - Student Startup Ideas{% endblock %}
+
+{% block content %}
+    <section class="form-section">
+        <div class="form-container">
+            <div class="form-header">
+                <h2>Share Your Startup Idea</h2>
+                <p class="form-intro">Got an innovative idea? Share it with the community and get feedback from fellow students and entrepreneurs!</p>
+            </div>
+            
+            <form method="POST" action="{{ url_for('main.submit') }}" class="idea-form" novalidate>
+                {{ form.hidden_tag() }}
+                
+                <div class="form-group">
+                    <div class="floating-label">
+                        {{ form.title(class="form-control", placeholder=" ") }}
+                        {{ form.title.label(class="form-label") }}
+                        <div class="form-underline"></div>
+                    </div>
+                    {% if form.title.errors %}
+                        <div class="form-error">
+                            <i class="fas fa-exclamation-circle"></i>
+                            {{ form.title.errors[0] }}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group half">
+                        <div class="floating-label">
+                            {{ form.student_name(class="form-control", placeholder=" ") }}
+                            {{ form.student_name.label(class="form-label") }}
+                            <div class="form-underline"></div>
+                        </div>
+                        {% if form.student_name.errors %}
+                            <div class="form-error">
+                                <i class="fas fa-exclamation-circle"></i>
+                                {{ form.student_name.errors[0] }}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="form-group half">
+                        <div class="floating-label">
+                            {{ form.category(class="form-control") }}
+                            {{ form.category.label(class="form-label") }}
+                            <div class="form-underline"></div>
+                        </div>
+                        {% if form.category.errors %}
+                            <div class="form-error">
+                                <i class="fas fa-exclamation-circle"></i>
+                                {{ form.category.errors[0] }}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <div class="floating-label">
+                        {{ form.problem(class="form-control", rows="3", placeholder=" ") }}
+                        {{ form.problem.label(class="form-label") }}
+                        <div class="form-underline"></div>
+                    </div>
+                    <div class="form-helper">
+                        <div class="char-count"><span id="problem-chars">0</span>/500</div>
+                        <div class="hint">What problem does your idea solve? Be specific about the pain points.</div>
+                    </div>
+                    {% if form.problem.errors %}
+                        <div class="form-error">
+                            <i class="fas fa-exclamation-circle"></i>
+                            {{ form.problem.errors[0] }}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group">
+                    <div class="floating-label">
+                        {{ form.description(class="form-control", rows="5", placeholder=" ") }}
+                        {{ form.description.label(class="form-label") }}
+                        <div class="form-underline"></div>
+                    </div>
+                    <div class="form-helper">
+                        <div class="char-count"><span id="desc-chars">0</span>/2000</div>
+                        <div class="hint">Describe your solution in detail. How does it work? What makes it unique?</div>
+                    </div>
+                    {% if form.description.errors %}
+                        <div class="form-error">
+                            <i class="fas fa-exclamation-circle"></i>
+                            {{ form.description.errors[0] }}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="form-actions">
+                    <button type="submit" class="button primary submit-button">
+                        <span class="button-text">Submit Idea</span>
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                    <a href="{{ url_for('main.index') }}" class="button secondary">
+                        <i class="fas fa-times"></i> Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+    </section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Character counters
+    const problemField = document.getElementById('problem');
+    const descField = document.getElementById('description');
+    const problemChars = document.getElementById('problem-chars');
+    const descChars = document.getElementById('desc-chars');
+    
+    // Update character counters
+    function updateCharCount(field, counter) {
+        if (field && counter) {
+            counter.textContent = field.value.length;
+        }
+    }
+    
+    // Initialize character counters
+    updateCharCount(problemField, problemChars);
+    updateCharCount(descField, descChars);
+    
+    // Add event listeners for character counting
+    if (problemField) {
+        problemField.addEventListener('input', () => updateCharCount(problemField, problemChars));
+    }
+    
+    if (descField) {
+        descField.addEventListener('input', () => updateCharCount(descField, descChars));
+    }
+    
+    // Add focus/blur effects for form controls
+    const formControls = document.querySelectorAll('.form-control');
+    formControls.forEach(control => {
+        // Add filled class if there's a value
+        if (control.value) {
+            control.parentElement.classList.add('filled');
+        }
+        
+        // Handle focus/blur events
+        control.addEventListener('focus', function() {
+            this.parentElement.classList.add('focused');
+        });
+        
+        control.addEventListener('blur', function() {
+            this.parentElement.classList.remove('focused');
+            if (this.value) {
+                this.parentElement.classList.add('filled');
+            } else {
+                this.parentElement.classList.remove('filled');
+            }
+        });
+    });
+    
+    // Add animation to submit button
+    const submitButton = document.querySelector('.submit-button');
+    if (submitButton) {
+        submitButton.addEventListener('click', function(e) {
+            if (this.closest('form').checkValidity()) {
+                this.classList.add('submitting');
+                this.querySelector('.button-text').textContent = 'Submitting...';
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

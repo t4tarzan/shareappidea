@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+
+{% block title %}Student Startup Ideas{% endblock %}
+
+{% block content %}
+    <section class="hero">
+        <h1>Student Startup Ideas</h1>
+        <p>Showcasing innovative ideas from students around the world</p>
+        <a href="{{ url_for('main.submit') }}" class="button primary">Submit Your Idea</a>
+    </section>
+
+    <!-- Search and Filter Section -->
+    <div class="search-container">
+        <input type="text" id="searchInput" class="search-input" placeholder="Search ideas...">
+        <select id="categoryFilter" class="category-filter">
+            <option value="">All Categories</option>
+            <option value="Technology">Technology</option>
+            <option value="Education">Education</option>
+            <option value="Healthcare">Healthcare</option>
+            <option value="Finance">Finance</option>
+            <option value="Sustainability">Sustainability</option>
+            <option value="Other">Other</option>
+        </select>
+    </div>
+
+    <section class="ideas-grid" id="ideasContainer">
+        {% for idea in ideas.items %}
+        <article class="idea-card" data-category="{{ idea.category or 'General' }}" data-title="{{ idea.title|lower }}" data-description="{{ idea.description|lower }}" data-problem="{{ idea.problem|lower }}">
+            <div class="idea-content">
+                <div class="idea-header">
+                    <h3>{{ idea.title }}</h3>
+                    <span class="category-badge">{{ idea.category or 'General' }}</span>
+                </div>
+                <p class="meta">By {{ idea.student_name }} • {{ idea.created_at.strftime('%b %d, %Y') }}</p>
+                <div class="problem-container">
+                    <h4>Problem:</h4>
+                    <p class="problem">{{ idea.problem|truncate(200) }}</p>
+                </div>
+                <div class="solution-container">
+                    <h4>Solution:</h4>
+                    <p class="description">{{ idea.description|truncate(300) }}</p>
+                </div>
+            </div>
+            <div class="idea-footer">
+                <span class="view-details">View Details</span>
+            </div>
+        </article>
+        {% else %}
+        <div class="no-ideas">
+            <p>No ideas have been submitted yet. Be the first to share your startup idea!</p>
+            <a href="{{ url_for('main.submit') }}" class="button">Submit an Idea</a>
+        </div>
+        {% endfor %}
+    </section>
+
+    {% if ideas.pages > 1 %}
+    <div class="pagination">
+        {% if ideas.has_prev %}
+            <a href="{{ url_for('main.index', page=ideas.prev_num) }}" class="button">Previous</a>
+        {% endif %}
+        
+        <span>Page {{ ideas.page }} of {{ ideas.pages }}</span>
+        
+        {% if ideas.has_next %}
+            <a href="{{ url_for('main.index', page=ideas.next_num) }}" class="button">Next</a>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <!-- Success Modal -->
+    <div id="successModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <div class="success-icon">✓</div>
+            <h2>Idea Submitted Successfully!</h2>
+            <p>Your startup idea has been submitted and is now visible to everyone.</p>
+            <div class="modal-actions">
+                <a href="{{ url_for('main.index') }}" class="button primary">View All Ideas</a>
+                <a href="{{ url_for('main.submit') }}" class="button secondary">Submit Another Idea</a>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Search and filter functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('searchInput');
+    const categoryFilter = document.getElementById('categoryFilter');
+    const ideaCards = document.querySelectorAll('.idea-card');
+
+    function filterIdeas() {
+        const searchTerm = searchInput.value.toLowerCase();
+        const selectedCategory = categoryFilter.value;
+
+        ideaCards.forEach(card => {
+            const title = card.dataset.title;
+            const description = card.dataset.description;
+            const problem = card.dataset.problem;
+            const category = card.dataset.category;
+
+            const matchesSearch = !searchTerm || 
+                                title.includes(searchTerm) || 
+                                description.includes(searchTerm) ||
+                                problem.includes(searchTerm);
+            
+            const matchesCategory = !selectedCategory || category === selectedCategory;
+
+            if (matchesSearch && matchesCategory) {
+                card.style.display = 'block';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    }
+
+    // Event listeners
+    searchInput.addEventListener('input', filterIdeas);
+    categoryFilter.addEventListener('change', filterIdeas);
+
+    // Check for success message in URL
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('submitted') === 'true') {
+        document.getElementById('successModal').style.display = 'flex';
+    }
+
+    // Close modal functionality
+    document.querySelector('.close-modal').addEventListener('click', function() {
+        document.getElementById('successModal').style.display = 'none';
+    });
+
+    // Close modal when clicking outside
+    window.addEventListener('click', function(event) {
+        const modal = document.getElementById('successModal');
+        if (event.target === modal) {
+            modal.style.display = 'none';
+        }
+    });
+});
+</script>
+{% endblock %}
